@@ -21,7 +21,7 @@ app.use(cors({
 }))
 //session
 const store = new MongoDBStore({
-  uri: 'mongodb://localhost:27017/uber',
+  uri:process.env.MONGO_URL,
   collection: 'mySessions'
 });
 app.use(session({
