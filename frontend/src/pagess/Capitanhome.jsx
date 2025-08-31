@@ -41,7 +41,7 @@ setride(data)
 setridepopup(true)
 })
 async function confirmridedata(){
-const response=await axios.post('http://localhost:5000/rides/confirm-ride',{
+const response=await axios.post(`${import.meta.env.VITE_API_URL}/rides/confirm-ride`,{
 rideid:ride._id,
 capitan:capitan}
 ,{

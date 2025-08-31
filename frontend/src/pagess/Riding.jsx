@@ -13,7 +13,6 @@ function Riding() {
   const navigate=useNavigate()
   const location=useLocation();
   const data=location.state?.ride;
-
   useEffect(()=>{
     onMessage('end-ride',()=>{
       navigate('/home')

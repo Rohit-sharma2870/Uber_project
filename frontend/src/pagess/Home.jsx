@@ -100,7 +100,7 @@ useEffect(() => {
       setLoading(true);
       try {
         const res = await axios.get(
-          "http://localhost:5000/maps/get-suggestions",
+          `${import.meta.env.VITE_API_URL}/maps/get-suggestions`,
           {
             params: { input: query },
           }
@@ -123,7 +123,7 @@ useEffect(() => {
     }
   };
   async function findtrip() {
-    const response = await axios.get("http://localhost:5000/rides/getfare", {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/rides/getfare`, {
       params: { pickup: origin, destination: destination },
        withCredentials: true
     });
@@ -132,7 +132,7 @@ useEffect(() => {
     setvehicleopen(true);
   }
   async function createride(){
-    const res = await axios.post("http://localhost:5000/rides/createride", {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/rides/createride`, {
       pickup: origin,
       destination: destination,
       vehicletype:vehicletype.toLowerCase(),

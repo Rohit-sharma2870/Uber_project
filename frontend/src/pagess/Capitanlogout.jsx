@@ -7,10 +7,9 @@ function Capitanlogout() {
   useEffect(() => {
     const logout = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/capitans/logout', {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/capitans/logout`,{
           withCredentials: true,
         });
-
         if (response.status === 200) {
           navigate('/capitanlogin');
         }
@@ -18,9 +17,7 @@ function Capitanlogout() {
         console.error('Logout failed:', error);
       }
     };
-
     logout();
   }, [navigate]);
 }
-
 export default Capitanlogout

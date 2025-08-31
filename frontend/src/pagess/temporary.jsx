@@ -6,8 +6,6 @@ import Ridepopup from '../components/Ridepopup';
 const Capitanhome = () => {
  const Ridepopupref=useRef();
   const[ridepopup,setridepopup]=useState(false);
-
-
       useGSAP(()=>{
     if(ridepopup){
       gsap.to(Ridepopupref.current,{

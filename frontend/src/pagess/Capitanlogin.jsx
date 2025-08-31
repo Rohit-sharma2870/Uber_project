@@ -14,7 +14,7 @@ function Capitanlogin() {
     e.preventDefault()
     try {
       const response = await axios.post(
-        'http://localhost:5000/capitans/login',
+        `${import.meta.env.VITE_API_URL}/capitans/login`,
         { email: email.current.value, password: password.current.value },
         { withCredentials: true }
       )

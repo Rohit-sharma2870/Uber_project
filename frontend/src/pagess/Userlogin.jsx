@@ -2,25 +2,21 @@ import React, { useRef, useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Usercontext } from '../contexts/usercontext' 
-
 function Userlogin() {
   const navigate = useNavigate()
   const email = useRef()
   const password = useRef()
   const [userdata, setuserdata] = useState({})
-  
   const { setuser } = useContext(Usercontext) 
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       const response = await axios.post(
-        'http://localhost:5000/users/login',
-        { email: email.current.value, password: password.current.value },
-        { withCredentials: true } 
+        `${import.meta.env.VITE_API_URL}/users/login`,
+        { email: email.current.value, password: password.current.value},
+        {withCredentials: true} 
       )
-
-      console.log('Login success:', response.data)
+      console.log('Login success:',response.data)
       setuserdata(response.data)
       setuser(response.data)
       localStorage.setItem("user", JSON.stringify(response.data))
@@ -63,7 +59,6 @@ function Userlogin() {
       <h3 className='mt-4 text-lg ml-12'>
         New here? <Link to='/usersignup' className='underline text-blue-500'>Create your account</Link>
       </h3>
-
       <Link
         to='/capitanlogin'
         className='w-full py-3 rounded bg-green-600 text-xl flex items-center mt-80 justify-center font-medium'
@@ -73,6 +68,5 @@ function Userlogin() {
     </div>
   )
 }
-
 export default Userlogin
 

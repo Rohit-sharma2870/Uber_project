@@ -8,7 +8,7 @@ function ProtectedRoute({ children }) {
     const checkAuth = async () =>{
       try{
         const response = await axios.get( 
-          `${import.meta.env.VITE_BASE_URL}/users/authcheck`,
+          `${import.meta.env.VITE_API_URL}/users/authcheck`,
           { withCredentials: true }
         );
         if (response.data.loggedin){

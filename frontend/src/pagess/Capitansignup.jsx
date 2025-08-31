@@ -27,7 +27,7 @@ vehicleplate:vehicleplate.current.value,
 vehicletype:vehicletype.current.value,
 capacity:capacity.current.value
   }
-    const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/capitans/register`,newcaptian,{
+    const response=await axios.post(`${import.meta.env.VITE_API_URL}/capitans/register`,newcaptian,{
   withCredentials: true, // must send cookie
 })
     const data=response.data;

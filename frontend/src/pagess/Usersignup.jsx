@@ -17,7 +17,7 @@ function usersignup(){
       email:email.current.value,
       password:password.current.value,
     }
-    const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,newuser,{
+    const response=await axios.post(`${import.meta.env.VITE_API_URL}/users/register`,newuser,{
   withCredentials: true, // must send cookie
 })
     const data=response.data;

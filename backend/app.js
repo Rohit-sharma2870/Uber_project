@@ -53,5 +53,5 @@ const mongooseconnecton=require('./mongodb-connection/mongoose-connection')
 //connection
 PORT=process.env.PORT
 server.listen(PORT,()=>{
-    console.log(`server is running at:http://localhost:${PORT}`)
+    console.log(`server is running at:${PORT}`)
 })

@@ -8,7 +8,7 @@ function Capitanprotected({ children }) {
     const checkAuth = async () => {
       try {
         const response = await axios.get( 
-          `${import.meta.env.VITE_BASE_URL}/capitans/authcheck`,
+          `${import.meta.env.VITE_API_URL}/capitans/authcheck`,
          { withCredentials: true }
         );
         if (response.data.loggedin){
