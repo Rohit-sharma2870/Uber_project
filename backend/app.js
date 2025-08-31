@@ -14,8 +14,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cors({
       origin: [
-        "http://localhost:5173",
-        "https://wdt9135m-5173.inc1.devtunnels.ms"
+        "http://localhost:5173"
       ],
   credentials:true                
 }))
@@ -25,20 +24,17 @@ const store = new MongoDBStore({
   collection: 'mySessions'
 });
 app.use(session({
-  secret: 'uber',
+  secret: process.env.JWT_SECRET || 'uber',
   resave: false,
   saveUninitialized:false,
   store:store,
   cookie: {
     httpOnly: true,
-    sameSite: 'lax',   // 'lax' works fine in dev
-    secure: false     
+    sameSite: 'lax',
+    secure:false    
   }
 }))
 initializeSocket(server)
-
-
-
 //routes
 const userrouter=require('./routers/userrouter')
 const capitanrouter=require('./routers/capitanrouter')
