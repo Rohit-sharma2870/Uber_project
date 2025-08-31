@@ -36,7 +36,7 @@ function Home(){
   const{user}=useContext(Usercontext)
   //useeffect
 useEffect(() => {
-  if (user && user._id) {
+  if (user && user._id){
       setTimeout(() => {
       sendMessage("join", { usertype: "user", userid: user._id });
     }, 500);
@@ -68,7 +68,6 @@ useEffect(() => {
       duration: 0.3,
     });
   }, [vehicleopen]);
-
   useGSAP(() => {
     gsap.to(confirmridepannel.current, {
       transform: confirmride ? "translateY(0)" : "translateY(100%)",
@@ -76,7 +75,6 @@ useEffect(() => {
       duration: 0.3,
     });
   }, [confirmride]);
-
   useGSAP(() => {
     gsap.to(vehiclefoundref.current, {
       transform: vehiclefound ? "translateY(0)" : "translateY(100%)",
@@ -84,7 +82,6 @@ useEffect(() => {
       duration: 0.3,
     });
   }, [vehiclefound]);
-
   useGSAP(() => {
     gsap.to(Waitingforadriverref.current, {
       transform: Waitingfordriver ? "translateY(0)" : "translateY(100%)",
@@ -92,7 +89,6 @@ useEffect(() => {
       duration: 0.3,
     });
   }, [Waitingfordriver]);
-
   // Fetch suggestions
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -119,9 +115,6 @@ useEffect(() => {
     };
     fetchSuggestions();
   }, [origin, destination, activeField]);
-
-  
-
   const handleLocationSelect = (location) => {
     if (activeField === "origin") {
       setOrigin(location.display_name);
