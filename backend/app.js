@@ -27,8 +27,6 @@ const store = MongoStore.create({
     tlsAllowInvalidCertificates: false
   }
 })
-
-
 app.use(session({
   secret: process.env.JWT_SECRET || "uber",
   resave: false,
@@ -40,8 +38,6 @@ app.use(session({
     secure:false
   }
 }));
-
-
 initializeSocket(server)
 //routes
 const userrouter=require('./routers/userrouter')
