@@ -1,7 +1,12 @@
-const mongoose=require('mongoose')
-mongoose.connect(process.env.mongo_URL).then(()=>{
-    console.log('connected successfully')    
-}).catch((err)=>{
-    console.log('error while connecting')
+const mongoose = require('mongoose')
+require('dotenv').config()
+
+mongoose.connect(process.env.MONGO_URL)
+.then(() => {
+    console.log('✅ MongoDB connected successfully')    
 })
-module.exports=mongoose.connection
+.catch((err) => {
+    console.error('❌ Error while connecting:', err.message)
+})
+
+module.exports = mongoose.connection
