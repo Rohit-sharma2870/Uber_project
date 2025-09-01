@@ -6,7 +6,7 @@ const dotenv=require('dotenv')
 dotenv.config()
 const cors=require('cors')
 const session = require('express-session')
-var MongoDBStore = require('connect-mongodb-session')(session);
+const MongoStore = require('connect-mongo')
 const app=express()
 const server = http.createServer(app);
 //encoded
@@ -19,10 +19,10 @@ app.use(cors({
   credentials:true                
 }))
 //session
-var store = new MongoDBStore({
-  uri:process.env.MONGO_URL,
-  collection: 'mySessions'
-});
+var store =MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    collectionName: 'mySessions',
+  });
 
 app.use(session({
   secret: process.env.JWT_SECRET || "uber",
