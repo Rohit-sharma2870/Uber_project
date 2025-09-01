@@ -19,10 +19,14 @@ app.use(cors({
   credentials:true                
 }))
 //session
-var store =MongoStore.create({
-    mongoUrl: process.env.MONGO_URL,
-    collectionName: 'mySessions',
-  });
+const store = MongoStore.create({
+  mongoUrl: process.env.MONGO_URL,
+  mongoOptions: {
+    tls: true,
+    tlsAllowInvalidCertificates: false
+  },
+  collectionName: "mySessions"
+})
 
 app.use(session({
   secret: process.env.JWT_SECRET || "uber",

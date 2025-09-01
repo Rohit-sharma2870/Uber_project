@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
 require('dotenv').config()
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.MONGO_URL, {
+  tls: true,
+  tlsAllowInvalidCertificates: false
+})
 .then(() => {
     console.log('✅ MongoDB connected successfully')    
 })
