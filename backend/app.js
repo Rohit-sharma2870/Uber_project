@@ -33,9 +33,6 @@ const store = MongoStore.create({
   collectionName: "mySessions",
 });
 
-// Trust proxy for secure cookies (important for Render/Heroku)
-app.set("trust proxy", 1);
-
 app.use(
   session({
     secret: process.env.JWT_SECRET || "uber",
