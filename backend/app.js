@@ -6,66 +6,49 @@ dotenv.config();
 const cors = require("cors");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
-
 const app = express();
 const server = http.createServer(app);
-const isProduction = process.env.NODE_ENV === "production";
-
-// Middleware
+//encoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// CORS
 app.use(
   cors({
-    origin: [
-      "http://localhost:5174",
-      "https://uber-frontend.onrender.com",
-    ],
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
-
-// Session
+//session
 const store = MongoStore.create({
   mongoUrl: process.env.MONGO_URL,
   collectionName: "mySessions",
 });
-
-
 app.use(
   session({
     secret: process.env.JWT_SECRET || "uber",
     resave: false,
     saveUninitialized: false,
-    store,
+    store: store,
     cookie: {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax",
+      secure: false,
     },
   })
 );
-
-// Sockets
 initializeSocket(server);
-
-// Routes
+//routes
 const userrouter = require("./routers/userrouter");
 const capitanrouter = require("./routers/capitanrouter");
 const maprouter = require("./routers/maprouter");
 const riderouter = require("./routers/riderouter");
-
 app.use("/users", userrouter);
 app.use("/capitans", capitanrouter);
 app.use("/maps", maprouter);
 app.use("/rides", riderouter);
-
-// MongoDB connection
-require("./mongodb-connection/mongoose-connection");
-
-// Start server
-const PORT = process.env.PORT || 5000;
+//mongoose connection
+const mongooseconnecton = require("./mongodb-connection/mongoose-connection");
+//connection
+PORT = process.env.PORT;
 server.listen(PORT, () => {
-  console.log(`Server is running at: ${PORT}`);
+  console.log(`server is running at:${PORT}`);
 });
