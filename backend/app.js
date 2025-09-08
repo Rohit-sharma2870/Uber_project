@@ -14,10 +14,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: isProduction
-      ? "https://your-frontend.onrender.com" // deployed frontend
-      : "http://localhost:5174",             // dev frontend
-    credentials: true,                        // 🚀 allow cookies
+    origin: [
+      "http://localhost:5174",
+      "https://your-frontend.onrender.com"
+    ],
+    credentials: true,
   })
 );
 //session
