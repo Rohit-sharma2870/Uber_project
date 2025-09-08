@@ -60,57 +60,77 @@ async(req,res,next)=>{
     res.json({message:"error while user login"})
    }
 }]
-exports.postlogin=[
+const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
+const usermodel = require('../models/usermodel');
+
+exports.postlogin = [
   body('email').isEmail().withMessage('Enter a valid email'),
-    body('password')
-   .isLength({min:8})
-    .withMessage('password must be atleast  8 characters long').trim()
-  ,async (req,res,next)=>{
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .trim(),
+
+  async (req, res, next) => {
     try {
-         const{email,password}=req.body;
-         const errors=validationResult(req)
-       if (!errors.isEmpty()) {
-    return res.status(400).json({ errors:errors.array().map((error)=>error.msg),oldinputs:{
-      email,password
-    }});
-  }
-  else{
- const user=await usermodel.findOne({email:email});
- if(!user){
-res.status(400).json({message:"invalid email or password"})
- }
- else{
-    const ismatch= await bcrypt.compare(password,user.password);
-    if(!ismatch){
-    res.status(400).json({message:"invalid email or password"})
-    }
-    else{
-        req.session.isloggedin=true
-        req.session.user = {
-  _id: user._id,
-  firstname: user.firstname,
-  email: user.email,
-  socketId: user.socketId || null
-};
-        req.session.save(() =>{
-        res.status(200).json(user);
-      });   
-    }
- }
-  }
+      const { email, password } = req.body;
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          errors: errors.array().map((error) => error.msg),
+          oldinputs: { email, password },
+        });
+      }
+
+      const user = await usermodel.findOne({ email });
+
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }
+
+      // ✅ Save user info in session
+      req.session.isloggedin = true;
+      req.session.user = {
+        _id: user._id,
+        firstname: user.firstname,
+        email: user.email,
+        socketId: user.socketId || null,
+      };
+
+      req.session.save(() => {
+        // ✅ Send only safe user info
+        const safeUser = {
+          _id: user._id,
+          firstname: user.firstname,
+          email: user.email,
+        };
+        res.status(200).json({ message: 'Login successful', user: safeUser });
+      });
     } catch (error) {
-      res.status(400).json({message:'error while login'})
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Error while logging in' });
     }
-}]
+  },
+];
 
 exports.authcheck = (req, res) => {
-  console.log('Session:', req.session); 
-  if (req.session.user){
-    res.status(200).json({ loggedin: true });
+  if (req.session?.user) {
+    res.status(200).json({ 
+      loggedin: true, 
+      user: req.session.user
+    });
   } else {
     res.status(401).json({ loggedin: false });
   }
 };
+
 exports.logout=(req,res)=>{
   req.session.isloggedin=false;
   req.session.user='';
