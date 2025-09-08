@@ -25,13 +25,13 @@ app.use(
     credentials: true,
   })
 );
-app.options("*", cors()); // handle preflight
 
 // Session
 const store = MongoStore.create({
   mongoUrl: process.env.MONGO_URL,
   collectionName: "mySessions",
 });
+
 
 app.use(
   session({
@@ -60,8 +60,10 @@ app.use("/users", userrouter);
 app.use("/capitans", capitanrouter);
 app.use("/maps", maprouter);
 app.use("/rides", riderouter);
+
 // MongoDB connection
 require("./mongodb-connection/mongoose-connection");
+
 // Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
