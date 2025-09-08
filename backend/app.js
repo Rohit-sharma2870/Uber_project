@@ -8,6 +8,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const app = express();
 const server = http.createServer(app);
+const isProduction = process.env.NODE_ENV === "production";
 //encoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,7 +25,7 @@ const store = MongoStore.create({
   mongoUrl: process.env.MONGO_URL,
   collectionName: "mySessions",
 });
-const isProduction = process.env.NODE_ENV === "production";
+
 
 app.use(
   session({
