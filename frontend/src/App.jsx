@@ -1,18 +1,18 @@
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
-import Index from "./pagess/Index";
-import Home from "./pagess/Home";
-import Userlogin from "./pagess/Userlogin";
-import Usersignup from "./pagess/Usersignup";
-import Capitanlogin from "./pagess/Capitanlogin";
-import Capitansignup from "./pagess/Capitansignup";
-import Logout from "./pagess/Logout";
-import Capitanhome from "./pagess/Capitanhome";
-import Capitanprotected from "./pagess/Capitanprotected";
-import Capitanlogout from "./pagess/Capitanlogout";
-import Riding from "./pagess/Riding";
-import Capitanride from "./pagess/Capitanride";
-import ProtectedRoute from "./pagess/Protectedroute";
+import Index from "./pages/Index";
+import Home from "./pages/Home";
+import Userlogin from "./pages/Userlogin";
+import Usersignup from "./pages/Usersignup";
+import Capitanlogin from "./pages/Capitanlogin";
+import Capitansignup from "./pages/Capitansignup";
+import Logout from "./pages/Logout";
+import Capitanhome from "./pages/Capitanhome";
+import Capitanprotected from "./pages/Capitanprotected";
+import Capitanlogout from "./pages/Capitanlogout";
+import Riding from "./pages/Riding";
+import Capitanride from "./pages/Capitanride";
+import ProtectedRoute from "./pages/Protectedroute";
 
 function App() {
   const [count, setCount] = useState(0);
