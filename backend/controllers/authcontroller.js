@@ -60,9 +60,7 @@ async(req,res,next)=>{
     res.json({message:"error while user login"})
    }
 }]
-const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
-const usermodel = require('../models/usermodel');
+
 
 exports.postlogin = [
   body('email').isEmail().withMessage('Enter a valid email'),
