@@ -7,8 +7,9 @@ let io; // will hold the Socket.IO instance
   io = Server(server, {
     cors: {
             origin: [
-        "http://localhost:5173",
-        "https://wdt9135m-5173.inc1.devtunnels.ms"
+            "http://localhost:5174", 
+        "http://localhost:5173", 
+        "https://uber-frontend.onrender.com"
       ],
       methods: ["GET", "POST"],
     },
