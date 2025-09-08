@@ -13,7 +13,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      // "https://your-frontend.onrender.com"
+    ],
     credentials: true,
   })
 );
@@ -30,11 +33,12 @@ app.use(
     store: store,
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none",
+      secure: true,
     },
   })
 );
+
 initializeSocket(server);
 //routes
 const userrouter = require("./routers/userrouter");
