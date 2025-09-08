@@ -6,56 +6,67 @@ dotenv.config();
 const cors = require("cors");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+
 const app = express();
 const server = http.createServer(app);
 const isProduction = process.env.NODE_ENV === "production";
-//encoded
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// CORS
 app.use(
   cors({
     origin: [
       "http://localhost:5174",
-      "https://your-frontend.onrender.com"
+      "https://uber-frontend.onrender.com",
     ],
     credentials: true,
   })
 );
-//session
+app.options("*", cors()); // handle preflight
+
+// Session
 const store = MongoStore.create({
   mongoUrl: process.env.MONGO_URL,
   collectionName: "mySessions",
 });
 
+// Trust proxy for secure cookies (important for Render/Heroku)
+app.set("trust proxy", 1);
 
 app.use(
   session({
     secret: process.env.JWT_SECRET || "uber",
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store,
     cookie: {
       httpOnly: true,
-      sameSite: isProduction ? "none" : "lax",
       secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
     },
   })
 );
 
+// Sockets
 initializeSocket(server);
-//routes
+
+// Routes
 const userrouter = require("./routers/userrouter");
 const capitanrouter = require("./routers/capitanrouter");
 const maprouter = require("./routers/maprouter");
 const riderouter = require("./routers/riderouter");
+
 app.use("/users", userrouter);
 app.use("/capitans", capitanrouter);
 app.use("/maps", maprouter);
 app.use("/rides", riderouter);
-//mongoose connection
-const mongooseconnecton = require("./mongodb-connection/mongoose-connection");
-//connection
-PORT = process.env.PORT;
+// MongoDB connection
+require("./mongodb-connection/mongoose-connection");
+// Start server
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`server is running at:${PORT}`);
+  console.log(`Server is running at: ${PORT}`);
 });
