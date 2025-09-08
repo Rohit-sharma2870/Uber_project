@@ -5,8 +5,8 @@ export const SocketProvider = ({ children }) => {
   const socketRef = useRef();
   useEffect(() => {
     // connect to backend server
-    socketRef.current = io("http://localhost:5000");
-
+  
+  socketRef.current = io(import.meta.env.VITE_API_URL);
     socketRef.current.on("connect", () => {
       console.log("✅ Connected to server:", socketRef.current.id);
     });
