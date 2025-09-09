@@ -115,7 +115,7 @@ exports.getprofile = async (req, res) => {
 };
 
 // ========================== CAPITAN LOGOUT ==========================
-exports.capitanLogout = (req, res) => {
+exports.logout = (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
