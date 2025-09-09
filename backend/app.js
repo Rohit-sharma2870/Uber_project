@@ -4,51 +4,44 @@ const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const app = express();
+const cookieParser = require("cookie-parser");
+
+const app = express(); // ✅ define app first
 const server = http.createServer(app);
-//encoded
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://uberfront.netlify.app"],
     credentials: true,
   })
 );
-//session
-const store = MongoStore.create({
-  mongoUrl: process.env.MONGO_URL,
-  collectionName: "mySessions",
-});
-app.use(
-  session({
-    secret: process.env.JWT_SECRET || "uber",
-    resave: false,
-    saveUninitialized: false,
-    store: store,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false,
-    },
-  })
-);
+
+// ✅ cookie parser must come after app is defined
+app.use(cookieParser());
+
+// Initialize socket
 initializeSocket(server);
-//routes
+
+// Routes
 const userrouter = require("./routers/userrouter");
 const capitanrouter = require("./routers/capitanrouter");
 const maprouter = require("./routers/maprouter");
 const riderouter = require("./routers/riderouter");
+
 app.use("/users", userrouter);
 app.use("/capitans", capitanrouter);
 app.use("/maps", maprouter);
 app.use("/rides", riderouter);
-//mongoose connection
+
+// MongoDB connection
 const mongooseconnecton = require("./mongodb-connection/mongoose-connection");
-//connection
-PORT = process.env.PORT;
+
+// Connection
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`server is running at:${PORT}`);
+  console.log(`Server is running at: ${PORT}`);
 });
