@@ -18,7 +18,7 @@ function usersignup(){
       password:password.current.value,
     }
     const response=await axios.post(`${import.meta.env.VITE_API_URL}/users/register`,newuser,{
-  withCredentials: true, // must send cookie
+  withCredentials: true,
 })
     const data=response.data;
     setuserdata(data)
