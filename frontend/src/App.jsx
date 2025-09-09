@@ -28,15 +28,19 @@ function App() {
       <Route path="/capitanlogout" element={<Capitanlogout />} />
       <Route path="/riding" element={<Riding />} />
       <Route
-        path="/Home"
+        path="/home"
         element={
+          <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/capitanhome"
         element={
+          <Capitanprotected>
             <Capitanhome />
+            </Capitanprotected>
         }
       />
     </Routes>

@@ -1,23 +1,16 @@
 import { createContext, useState, useEffect } from "react";
-
+// Create the context
 export const Usercontext = createContext();
-
+// Provider component
 export const Usercontextprovider = ({ children }) => {
-  const [user, setuser] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    password: "",
-  });
-
-  // Load user from localStorage when app starts
+  const [user, setuser] = useState(null); 
+  // Load user from localStorage when the app starts
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    if (storedUser){
       setuser(JSON.parse(storedUser));
     }
   }, []);
-
   // Save user to localStorage whenever it changes
   useEffect(() => {
     if (user && user.email) {
@@ -27,9 +20,11 @@ export const Usercontextprovider = ({ children }) => {
     }
   }, [user]);
 
+  const values = { user, setuser };
   return (
-    <Usercontext.Provider value={{ user, setuser }}>
+    <Usercontext.Provider value={values}>
       {children}
     </Usercontext.Provider>
   );
 };
+
