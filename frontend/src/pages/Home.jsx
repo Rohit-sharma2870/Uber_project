@@ -133,15 +133,26 @@ useEffect(() => {
     setpanelopen(false);
     setvehicleopen(true);
   }
-  async function createride(){
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/rides/createride`, {
-      pickup: origin,
-      destination: destination,
-      vehicletype:vehicletype.toLowerCase(),
-    },{
-      withCredentials:true
-    });
+async function createride() {
+  if (!origin || !destination || !vehicletype) {
+    alert("Select origin, destination and vehicle type");
+    return;
   }
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/rides/createride`,
+      {
+        pickup: origin,
+        destination: destination,
+        vehicletype: vehicletype.toLowerCase(),
+      },
+      { withCredentials: true }
+    );
+    console.log("Ride created:", res.data);
+  } catch (err) {
+    console.error("Create ride error:", err.response?.data || err.message);
+  }
+}
   return (
     <div className="h-screen w-screen relative overflow-hidden bg-gray-100">
       {/* Background */}

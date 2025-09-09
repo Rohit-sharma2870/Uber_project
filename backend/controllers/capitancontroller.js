@@ -1,140 +1,117 @@
-const {body,validationResult}=require('express-validator')
-const capitanmodel=require('../models/capitan-model')
-const bcrypt=require('bcryptjs')
-exports.register=[
-//firstname
-  body('firstname').trim().isLength({ min: 3 }).withMessage(' firstname must be at least 3 characters long').matches(/^[a-zA-Z\-']+$/)
-    .withMessage('firstname contains only letters'),
-    //lastname
-body('lastname').trim().matches(/^[a-zA-Z\-']+$/)
-    .withMessage('laststname contains only letters'),
-body('email').isEmail().withMessage('Enter a valid email'),
-//check password
-  body('password')
-   .isLength({min:8})
-    .withMessage('password must be atleast  8 characters long')
-    .matches(/[a-z]/)
-    .withMessage('password must contain atleast a lower case letter')
-    .matches(/[A-Z]/)
-    .withMessage('password must contain atleast one upper case letter')
-    .matches(/[!@#$%^&*()]/)
-    .withMessage('password must contain aleast one special character')
-    .trim(),
-//     //confirm password
-//     body('confirmpassword')
-//     .trim()
-//     .custom((value,{req})=>{
-// if(value!==req.body.password){
-// throw new Error('password donot match')
-// }
-// return true;
-//     }),
-    body('vehiclecolour').isLength({min:3}).withMessage('vehicle colour must have atleast 3 character'),
-     body('vehicleplate').isLength({min:3}).withMessage('vehicle number must have atleast 3 character'),
-     body('capacity').isInt({min:1}).withMessage('capacity must be  atleast 1'),
-     body('vehicletype').isIn(['car','motorcycle','auto']).withMessage('invalid vehicle type')
-,async(req,res,next)=>{
-    try {
-const{firstname,lastname,email,password,vehiclecolour,vehicleplate,capacity,vehicletype}=req.body;
-console.log(firstname,lastname,email,password,vehiclecolour,vehicleplate,capacity,vehicletype)
- const errors=validationResult(req)
-       if (!errors.isEmpty()) {
-    return res.status(400).json({ errors:errors.array().map((error)=>error.msg),oldinputs:{
-    firstname,lastname,email,password,vehiclecolour,vehicleplate,capacity,vehicletype
-    }});
-  }
-  else{
-const isalreadyexist= await capitanmodel.findOne({email:email})
-if(isalreadyexist){
-    res.status(409).json({message:"user already exist"})
-}
-else{
-     bcrypt.hash(password,10).then(async(hashedpassword)=>{
-     const capitan=await capitanmodel.create({
-    firstname,
-    lastname,
-    email,
-    password:hashedpassword,
-  vehicle:{
-    colour:vehiclecolour,
-    plate:vehicleplate,
-    capacity:capacity,
-    vehicletype:vehicletype,
-  },
-   })
-   res.json(capitan)
-  })   
-}
-  }
-    } catch (error) {
-res.json({message:"error while creating capitan"})
-    }
-}]
+const { body, validationResult } = require('express-validator');
+const capitanmodel = require('../models/capitan-model');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-exports.postlogin = [
-  body("email").isEmail().withMessage("Enter a valid email"),
-  body("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
+// Secret for JWT (store in .env)
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+
+// ----------------- REGISTER -----------------
+exports.register = [
+  body('firstname')
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage('Firstname must be at least 3 characters long')
+    .matches(/^[a-zA-Z\-']+$/)
+    .withMessage('Firstname contains only letters'),
+  body('lastname')
+    .trim()
+    .matches(/^[a-zA-Z\-']+$/)
+    .withMessage('Lastname contains only letters'),
+  body('email').isEmail().withMessage('Enter a valid email'),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+    .matches(/[a-z]/).withMessage('Password must contain a lowercase letter')
+    .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter')
+    .matches(/[!@#$%^&*()]/).withMessage('Password must contain a special character')
     .trim(),
+  body('vehiclecolour').isLength({ min: 3 }).withMessage('Vehicle colour must have at least 3 characters'),
+  body('vehicleplate').isLength({ min: 3 }).withMessage('Vehicle number must have at least 3 characters'),
+  body('capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
+  body('vehicletype').isIn(['car', 'motorcycle', 'auto']).withMessage('Invalid vehicle type'),
+
   async (req, res, next) => {
     try {
-      const { email, password } = req.body;
       const errors = validationResult(req);
-
       if (!errors.isEmpty()) {
         return res.status(400).json({
-          errors: errors.array().map((error) => error.msg),
-          oldinputs: { email, password },
+          errors: errors.array().map(e => e.msg),
+          oldinputs: req.body
         });
       }
 
-      const capitan = await capitanmodel.findOne({ email });
-      if (!capitan) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
+      const { firstname, lastname, email, password, vehiclecolour, vehicleplate, capacity, vehicletype } = req.body;
 
-      const ismatch = await bcrypt.compare(password, capitan.password);
-      if (!ismatch) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
+      const existing = await capitanmodel.findOne({ email });
+      if (existing) return res.status(409).json({ message: "Captain already exists" });
 
-      // ✅ Save only safe data into session
-      req.session.isloggedin = true;
-      req.session.capitan = {
-        _id: capitan._id,
-        firstname: capitan.firstname,
-        email: capitan.email,
-        socketId: capitan.socketId || null,
-      };
-
-      req.session.save(() => {
-        console.log("Capitan session after login:", req.session);
-        res.status(200).json({
-          message: "Capitan login successful",
-          capitan:capitan,
-        });
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const capitan = await capitanmodel.create({
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        vehicle: { colour: vehiclecolour, plate: vehicleplate, capacity, vehicletype }
       });
-    } catch (error) {
-      res.status(500).json({ message: "Error while capitan login", error: error.message });
+
+      res.status(201).json({ message: "Captain registered successfully", capitan });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error while creating captain", error: err.message });
     }
-  },
+  }
 ];
 
-exports.logout=(req,res,next)=>{
-  req.session.isloggedin=false
-  req.session.capitan=" "
-  res.status(200).json({message:" capitan logout"})
-}
-exports.getprofile=(req,res,next)=>{
-    res.json(req.session.capitan)
-}
+// ----------------- LOGIN -----------------
+exports.postlogin = [
+  body("email").isEmail().withMessage("Enter a valid email"),
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long").trim(),
 
-exports.authcheck = (req, res) => {
-  console.log('Session:', req.session); 
-  if (req.session.capitan) {
-    res.status(200).json({ loggedin: true });
-  } else {
-    res.status(401).json({ loggedin: false });
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array().map(e => e.msg) });
+
+      const { email, password } = req.body;
+      const capitan = await capitanmodel.findOne({ email });
+      if (!capitan) return res.status(401).json({ message: "Invalid email or password" });
+
+      const isMatch = await bcrypt.compare(password, capitan.password);
+      if (!isMatch) return res.status(401).json({ message: "Invalid email or password" });
+
+      // Create JWT
+      const token = jwt.sign({
+        id: capitan._id,
+        email: capitan.email,
+        firstname: capitan.firstname
+      }, JWT_SECRET, { expiresIn: '7d' });
+
+      res.status(200).json({
+        message: "Login successful",
+        capitan: {
+          id: capitan._id,
+          firstname: capitan.firstname,
+          email: capitan.email,
+          vehicle: capitan.vehicle
+        },
+        token
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Error during login", error: err.message });
+    }
+  }
+];
+
+// ----------------- GET PROFILE -----------------
+exports.getprofile = async (req, res) => {
+  try {
+    const capitan = req.capitan; // set by JWT auth middleware
+    if (!capitan) return res.status(401).json({ message: "Unauthorized" });
+    res.json({ capitan });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching profile", error: err.message });
   }
 };
+
+
