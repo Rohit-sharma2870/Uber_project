@@ -89,6 +89,8 @@ useEffect(() => {
       duration: 0.3,
     });
   }, [Waitingfordriver]);
+
+  
   // Fetch suggestions
   useEffect(() => {
     const fetchSuggestions = async () => {
