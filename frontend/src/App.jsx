@@ -13,6 +13,7 @@ import Capitanlogout from "./pages/Capitanlogout";
 import Riding from "./pages/Riding";
 import Capitanride from "./pages/Capitanride";
 import ProtectedRoute from "./pages/Protectedroute";
+//comment
 
 function App() {
   const [count, setCount] = useState(0);
