@@ -22,7 +22,7 @@ function Capitanlogin() {
       setcapitandata(response.data)
       const capitan=response.data.capitan;
       setcapitan(capitan)
-     localStorage.setItem("capitan", JSON.stringify(response.data))
+     localStorage.setItem("capitan", JSON.stringify(capitan))
       navigate('/capitanhome')
     } catch (error) {
       if (error.response) {

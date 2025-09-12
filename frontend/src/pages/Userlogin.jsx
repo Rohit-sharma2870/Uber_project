@@ -2,21 +2,17 @@ import React, { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Usercontext } from "../contexts/usercontext";
-
 function Userlogin() {
   const navigate = useNavigate();
   const email = useRef();
   const password = useRef();
   const { setuser } = useContext(Usercontext);
-
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/users/login`,

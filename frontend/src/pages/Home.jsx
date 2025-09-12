@@ -43,6 +43,7 @@ useEffect(() => {
   }
   onMessage('ride-confirmed',ride=>{
     setride(ride)
+    console.log("confirm ride is :",ride)
   setvehiclefound(false)
    setvehicleopen(false)
    setconfirmride(false)

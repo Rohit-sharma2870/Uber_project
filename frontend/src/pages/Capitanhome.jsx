@@ -19,24 +19,34 @@ const Capitanhome = () => {
     //useeffect
 useEffect(() => {
   if (!capitan?._id) return;
-  sendMessage("join", { usertype: "capitan", userid: capitan._id });
+  // Join as capitan
+  sendMessage("join", { usertype: "capitan", userid: capitan._id});
+  // Send location
   const updateLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        sendMessage("update-locations",{
-          userid: capitan._id,
-          latitude: position.coords.latitude, 
-          longitude: position.coords.longitude,
-        });
-      });
+  navigator.geolocation.getCurrentPosition(
+  (position) => {
+    console.log("📍 Position received:", position.coords);
+    sendMessage("update-locations", {
+      userid: capitan._id,
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    });
+  },
+  (error) => {
+    console.error(" Geolocation error:", error);
+  }
+);
+
     }
   };
   updateLocation();
   const interval = setInterval(updateLocation, 10000);
   return () => clearInterval(interval);
-}, [capitan?._id, sendMessage]); 
+}, [capitan?._id, sendMessage]);
 
 onMessage('new-ride',(data)=>{
+console.log(data)
 setride(data)
 setridepopup(true)
 })
@@ -48,10 +58,8 @@ capitan:capitan}
   withCredentials:true
 })
 setridepopup(false);
-setconfirmride(true)
+setconfirmride(true);
 }
-
-
   useGSAP(() => {
     if (ridepopup) {
       gsap.to(Ridepopupref.current,{
@@ -86,7 +94,6 @@ setconfirmride(true)
           alt="Loading Animation"
         />
       </div>
-
       {/* Bottom Half - Info Card */}
       <div className="min-h-[40vh] bg-white rounded-t-3xl shadow-xl py-6 px-6">
         <Capitandetails setridepopup={setridepopup} />

@@ -45,7 +45,7 @@ exports.createride = async (req, res, next) => {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
-    const user = req.user; // ✅ comes from JWT middleware
+    const user = req.user;
     const { pickup, destination, vehicletype } = req.body;
 
     if (!user || !pickup || !destination || !vehicletype) {
@@ -67,35 +67,37 @@ exports.createride = async (req, res, next) => {
       status: "pending",
     });
 
-    const pickupCoords = await mapservice.getCoordinates(pickup);
-    const capitansInRadius = await mapservice.getCapitansInRadius(
-      pickupCoords.lat,
-      pickupCoords.lng,
-      10
-    );
-
-    const rideWithUser = await ridemodel
-      .findById(ride._id)
-      .populate("user");
-
+//     const pickupCoords = {
+//   lat: 34.0090786,   // latitude of Srinagar city
+//   lng:  74.7102958   // longitude of Srinagar city
+// };
+  const pickupCoords = await mapservice.getCoordinates(pickup);
+ const capitansInRadius = await mapservice.getCapitansInRadius(
+  pickupCoords.lat, 
+  pickupCoords.lng,
+  50
+);
+console.log(pickupCoords,capitansInRadius)
+const rideWithUser = await ridemodel
+  .findById(ride._id)
+  .populate("user")
+  .select("+otp");
     // ✅ Notify nearby captains
     capitansInRadius.forEach((capitan) => {
-      if (capitan.socketId) {
-        sendMessageToSocketId(capitan.socketId, {
+      if (capitan.socketId){
+         console.log("log before new ride",rideWithUser)
+        sendMessageToSocketId(capitan.socketId,{
           event: "new-ride",
           data: rideWithUser,
         });
       }
     });
-
-    res
-      .status(201)
+    res.status(201)
       .json({ message: "Ride created successfully", ride: rideWithUser });
-  } catch (error) {
+  } catch (error){
     next(error);
   }
 };
-
 // ========================== GET FARE ==========================
 exports.getfare = async (req, res, next) => {
   try {
@@ -111,40 +113,42 @@ exports.getfare = async (req, res, next) => {
     next(error);
   }
 };
-
 // ========================== CONFIRM RIDE ==========================
 exports.confirmride = async (req, res, next) => {
   try {
     const { rideid } = req.body;
-    const capitan = req.user; // ✅ capitan JWT
-
-    if (!rideid || !capitan)
-      return res
-        .status(400)
-        .json({ message: "rideid and capitan are required" });
-
+    const capitan = req.capitan; 
+    if (!rideid || !capitan) {
+      return res.status(400).json({ message: "rideid and capitan are required" });
+    }
     const ride = await ridemodel
       .findByIdAndUpdate(
         rideid,
         { status: "accepted", capitan: capitan._id },
         { new: true }
       )
-      .populate("user capitan");
+      .populate('user').populate('capitan').select("+otp");;
 
-    if (!ride) return res.status(404).json({ message: "Ride not found" });
-
+    if (!ride) {
+      return res.status(404).json({ message: "Ride not found" });
+    }
     if (ride.user?.socketId) {
+      console.log('log ride before confirmed',ride)
       sendMessageToSocketId(ride.user.socketId, {
         event: "ride-confirmed",
         data: ride,
       });
     }
-
-    res.status(200).json({ message: "Ride confirmed", ride });
+    res.status(200).json({
+      message: "Ride confirmed successfully",
+      ride,
+    });
   } catch (error) {
+    console.error(" Error confirming ride:", error);
     next(error);
   }
 };
+
 
 // ========================== START RIDE ==========================
 exports.startride = async (req, res, next) => {
@@ -185,7 +189,7 @@ exports.startride = async (req, res, next) => {
 exports.finishride = async (req, res, next) => {
   try {
     const { rideid } = req.body;
-    const capitan = req.user; 
+    const capitan = req.capitan; 
 
     if (!rideid) {
       return res.status(400).json({ message: "rideid is required" });

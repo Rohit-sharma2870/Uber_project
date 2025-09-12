@@ -19,7 +19,6 @@ module.exports.getCoordinates=async (address)=> {
         },
       }
     );
-
     if (!response.data.length) {
       throw new Error("Address not found");
     }
@@ -113,19 +112,23 @@ module.exports.getSuggestions = async (input) => {
   }
 };
 module.exports.getCapitansInRadius = async (lat, lng, radiusKm) => {
-  const radiusInRadians = radiusKm / 6378.1;
+  const radiusInMeters = radiusKm * 1000;
 
-  // console.log("Searching around:", { lat, lng, radiusKm, radiusInRadians });
+ const pickupLat = Number(lat);
+const pickupLng = Number(lng);
 
-  const result = await capitanModel.find({
-    location: {
-      $geoWithin: {
-        $centerSphere: [[parseFloat(lng), parseFloat(lat)], radiusInRadians]
-      }
+const result = await capitanModel.find({
+  location: {
+    $near: {
+      $geometry: {
+        type: "Point",
+        coordinates: [pickupLng, pickupLat]
+      },
+      $maxDistance: radiusInMeters
     }
-  });
-
-  // console.log("Found captains:", result);
+  }
+});
+  console.log("✅ Captains found:", result);
   return result;
 };
 

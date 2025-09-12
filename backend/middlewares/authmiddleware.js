@@ -25,13 +25,17 @@ exports.userauth = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
   }
 };
+
 // ====================== CAPITAN AUTH ======================
 exports.capitanauth = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
+    console.log(req.cookies); // ✅ use req.cookies instead of res.cookies
+
     if (!token) {
       return res.status(401).json({ message: "Unauthorized: Please log in" });
     }
+
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -41,9 +45,11 @@ exports.capitanauth = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized: Capitan not found" });
     }
 
-    req.capitan = capitan; // ✅ attach full capitan doc
+    // ✅ Attach capitan to request
+    req.capitan = capitan;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
   }
 };
+
