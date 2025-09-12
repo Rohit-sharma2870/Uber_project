@@ -12,6 +12,7 @@ function initializeSocket(server) {
         "http://localhost:5173",
         "http://localhost:5174",
         "https://uberfront.netlify.app",
+        "https://68c407d0a28e710096e1b76b--uberfront.netlify.app",
       ],
       methods: ["GET", "POST"],
       credentials: true,
