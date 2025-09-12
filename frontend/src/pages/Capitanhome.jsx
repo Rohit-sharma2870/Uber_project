@@ -53,7 +53,7 @@ setridepopup(true)
 async function confirmridedata(){
 const response = await axios.post(
     `${import.meta.env.VITE_API_URL}/rides/confirm-ride`,
-    { rideid: ride._id },  // ✅ only send rideid
+    { rideid: ride._id },
     { withCredentials: true }
   );
   console.log("Ride confirmed:", response.data);

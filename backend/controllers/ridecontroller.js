@@ -118,6 +118,7 @@ exports.confirmride = async (req, res, next) => {
   try {
     const { rideid } = req.body;
     const capitan = req.capitan; 
+    console.log("at confirm ride",rideid,capitan)
     if (!rideid || !capitan) {
       return res.status(400).json({ message: "rideid and capitan are required" });
     }

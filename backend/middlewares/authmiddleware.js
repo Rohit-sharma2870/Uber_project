@@ -31,11 +31,9 @@ exports.capitanauth = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
     console.log(req.cookies); // ✅ use req.cookies instead of res.cookies
-
     if (!token) {
       return res.status(401).json({ message: "Unauthorized: Please log in" });
     }
-
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
