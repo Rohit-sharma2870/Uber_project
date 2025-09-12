@@ -19,19 +19,16 @@ riderouter.post('/createride',
     )
 
     riderouter.post('/confirm-ride',
-    capitanauth,
     body('rideid').isMongoId().withMessage(' invalid rideid'),
     ridecontroller.confirmride
     )
     riderouter.post('/start-ride',
-      capitanauth,
       body('rideid').isMongoId().withMessage('invalid rideid'),
       body('otp').isString().isLength({min:6,max:6}).withMessage('invalid otp'),
       ridecontroller.startride
     )
 
     riderouter.post('/finish-ride',
-      capitanauth,
        body('rideid').isMongoId().withMessage('invalid rideid'),
       ridecontroller.finishride
     )
