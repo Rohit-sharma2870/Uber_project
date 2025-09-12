@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://uberfront.netlify.app"],
+    origin: ["http://localhost:5173", "https://uberfront.netlify.app", "https://68c407d0a28e710096e1b76b--uberfront.netlify.app",],
     credentials: true,
   })
 );
