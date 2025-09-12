@@ -51,12 +51,12 @@ setride(data)
 setridepopup(true)
 })
 async function confirmridedata(){
-const response=await axios.post(`${import.meta.env.VITE_API_URL}/rides/confirm-ride`,{
-rideid:ride._id,
-capitan:capitan}
-,{
-  withCredentials:true
-})
+const response = await axios.post(
+    `${import.meta.env.VITE_API_URL}/rides/confirm-ride`,
+    { rideid: ride._id },  // ✅ only send rideid
+    { withCredentials: true }
+  );
+  console.log("Ride confirmed:", response.data);
 setridepopup(false);
 setconfirmride(true);
 }
