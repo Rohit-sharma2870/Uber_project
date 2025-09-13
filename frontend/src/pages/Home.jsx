@@ -101,24 +101,25 @@ useEffect(() => {
         return;
       }
       setLoading(true);
-       try {
-         const res = await axios.get(
+      try {
+  const res = await axios.get(
     `${import.meta.env.VITE_API_URL}/maps/get-suggestions`,
     {
       params: { input: query },
       withCredentials: true,
     }
   );
-        setSuggestions(res.data.suggestions || []);
-      } catch (err) {
-        console.error("Error fetching suggestions:", err);
-        setSuggestions([]);
-      } finally {
+  setSuggestions(res.data);
+} catch (err) {
+  console.error("Error fetching suggestions:", err.message);
+  setSuggestions([]); 
+}finally {
         setLoading(false);
       }
     };
     fetchSuggestions();
   }, [origin, destination, activeField]);
+
   const handleLocationSelect = (location) => {
     if (activeField === "origin") {
       setOrigin(location.display_name);

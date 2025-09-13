@@ -79,38 +79,28 @@ module.exports.getDistanceAndTime = async (origin, destination) => {
 };
 
 module.exports.getSuggestions = async (input) => {
-  if (!input) {
-    throw new Error("Search input is required");
-  }
+  if (!input || input.length < 2) return [];
 
   try {
     const response = await axios.get("https://nominatim.openstreetmap.org/search", {
-      params: {
-        q: input,
-        format: "json",
-        addressdetails: 1,
-        limit: 5,
-      },
-      headers: {
-        "User-Agent": "UberPro/1.0 (rohitbral5212@gmail.com)",
-      },
+      params: { q: input, format: "json", addressdetails: 1, limit: 5 },
+      headers: { "User-Agent": "UberPro/1.0 (rohitbral5212@gmail.com)" },
+      timeout: 5000, // avoid hanging requests
     });
 
-    if (!response.data.length) {
-      return [];
-    }
+    if (!response.data.length) return [];
 
-    // Return an array of place names
-    return response.data.map((place) => ({
+    return response.data.map(place => ({
       display_name: place.display_name,
       lat: place.lat,
       lon: place.lon,
     }));
   } catch (error) {
     console.error("Error fetching suggestions:", error.message);
-    throw error;
+    return []; // <- prevent 500 crash
   }
 };
+
 module.exports.getCapitansInRadius = async (lat, lng, radiusKm) => {
   const radiusInMeters = radiusKm * 1000;
 
