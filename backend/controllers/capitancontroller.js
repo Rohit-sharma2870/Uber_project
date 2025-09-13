@@ -134,10 +134,10 @@ exports.postlogin = [
       // ✅ Set cookie
       res.cookie("capitanToken", token, {
         httpOnly: true,
-        secure: isProduction,                     // HTTPS only in production
-        sameSite: isProduction ? "None" : "Lax",  // Cross-site only in prod
+        secure: isProduction,                     
+        sameSite: isProduction ? "None" : "Lax",  
         path: "/",
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        maxAge: 24 * 60 * 60 * 1000, 
       });
 
       // ✅ Return success response

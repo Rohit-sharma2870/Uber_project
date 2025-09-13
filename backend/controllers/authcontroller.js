@@ -112,13 +112,13 @@ exports.postlogin = [
       const isProduction = process.env.NODE_ENV === "production";
 
       // ✅ Set cookie with environment-aware options
-      res.cookie("userToken", token, {
-        httpOnly: true,
-        secure: isProduction,                  
-        sameSite: isProduction ? "None" : "Lax", 
-        path: "/",
-        maxAge: 24 * 60 * 60 * 1000,
-      });
+     res.cookie("userToken", token, {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "None" : "Lax",
+  path: "/",
+  maxAge: 24 * 60 * 60 * 1000,
+});
 
       const safeUser = {
         _id: user._id,
