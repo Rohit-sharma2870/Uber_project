@@ -38,7 +38,6 @@ exports.capitanauth = async (req, res, next) => {
     if (!capitan) {
       return res.status(401).json({ message: "Unauthorized: Capitan not found" });
     }
-
     req.capitan = capitan;
     next();
   } catch (err) {

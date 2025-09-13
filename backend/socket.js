@@ -2,9 +2,7 @@
 const Server = require("socket.io");
 const usermodel = require("./models/usermodel");
 const capitanmodel = require("./models/capitan-model");
-
 let io; // global socket.io instance
-
 function initializeSocket(server) {
   io = Server(server, {
     cors: {
@@ -18,10 +16,8 @@ function initializeSocket(server) {
       credentials: true,
     },
   });
-
   io.on("connection", (socket) => {
     console.log("✅ New client connected:", socket.id);
-
     // ======================= JOIN =======================
     socket.on("join", async (data) => {
       try {
@@ -33,13 +29,11 @@ function initializeSocket(server) {
         } else if (usertype === "capitan") {
           await capitanmodel.findByIdAndUpdate(userid, { socketId: socket.id });
         }
-
         console.log(` ${usertype} (${userid}) linked to socket ${socket.id}`);
       } catch (err) {
         console.error(" Error in join handler:", err.message);
       }
     });
-
     // =================== UPDATE LOCATIONS ===================
     socket.on("update-locations", async (data) => {
       try {
