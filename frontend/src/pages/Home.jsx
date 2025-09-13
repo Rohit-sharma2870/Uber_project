@@ -94,31 +94,31 @@ useEffect(() => {
   
   // Fetch suggestions
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      let query = activeField === "origin" ? origin : destination;
-      if (!query || query.length < 2) {
-        setSuggestions([]);
-        return;
-      }
-      setLoading(true);
-      try {
-  const res = await axios.get(
-    `${import.meta.env.VITE_API_URL}/maps/get-suggestions`,
-    {
-      params: { input: query },
-      withCredentials: true,
+  const fetchSuggestions = async () => {
+    const query = activeField === "origin" ? origin : destination;
+
+    // Skip empty or very short queries
+    if (!query || query.trim().length < 2) {
+      setSuggestions([]);
+      return;
     }
-  );
-  setSuggestions(res.data);
-} catch (err) {
-  console.error("Error fetching suggestions:", err.message);
-  setSuggestions([]); 
-}finally {
-        setLoading(false);
-      }
-    };
-    fetchSuggestions();
-  }, [origin, destination, activeField]);
+    setLoading(true);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/maps/get-suggestions`, {
+        params: { input: query.trim() },
+        withCredentials: true,
+      });
+      setSuggestions(res.data || []);
+    } catch (err) {
+      console.error("Error fetching suggestions:", err.message);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchSuggestions();
+}, [origin, destination, activeField]);
 
   const handleLocationSelect = (location) => {
     if (activeField === "origin") {

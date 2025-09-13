@@ -31,6 +31,4 @@ router.get(
   ],
   mapcontroller.getsuggestions
 );
-
-
 module.exports = router;

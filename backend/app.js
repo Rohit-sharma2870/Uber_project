@@ -12,10 +12,12 @@ const server = http.createServer(app);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+const isProduction = process.env.NODE_ENV === "production";
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://uberfront.netlify.app", "https://68c407d0a28e710096e1b76b--uberfront.netlify.app",],
+    origin:isProduction
+  ? ["https://uberfront.netlify.app", "https://68c407d0a28e710096e1b76b--uberfront.netlify.app"]
+  : ["http://localhost:5173"],
     credentials: true,
   })
 );

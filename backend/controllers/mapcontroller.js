@@ -43,12 +43,19 @@ exports.getsuggestions = async (req, res) => {
       errors: errors.array().map(err => err.msg),
     });
   }
+
   try {
     const { input } = req.query;
+
+    // Fetch suggestions safely
     const suggestions = await mapservice.getSuggestions(input);
-    res.json({ suggestions });
+
+    // Ensure suggestions is always an array
+    res.json({ suggestions: suggestions || [] });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch suggestions", error: error.message });
+    console.error("Error in /get-suggestions:", error.message);
+    // Return empty array instead of 500 for transient API issues
+    res.json({ suggestions: [] });
   }
 };
 

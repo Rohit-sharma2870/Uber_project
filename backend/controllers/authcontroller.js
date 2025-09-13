@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const usermodel = require("../models/usermodel");
 
-// ========================== REGISTER ==========================
+// ================= REGISTER =================
 exports.userregister = [
   body("firstname")
     .trim()
@@ -11,14 +11,11 @@ exports.userregister = [
     .withMessage("Firstname must be at least 3 characters long")
     .matches(/^[a-zA-Z\-']+$/)
     .withMessage("Firstname can contain only letters"),
-
   body("lastname")
     .trim()
     .matches(/^[a-zA-Z\-']+$/)
     .withMessage("Lastname can contain only letters"),
-
   body("email").isEmail().withMessage("Enter a valid email"),
-
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long")
@@ -37,13 +34,13 @@ exports.userregister = [
 
       if (!errors.isEmpty()) {
         return res.status(400).json({
-          errors: errors.array().map((error) => error.msg),
-          oldinputs: { firstname, lastname, email, password },
+          errors: errors.array().map((err) => err.msg),
+          oldinputs: { firstname, lastname, email },
         });
       }
 
-      const isAlreadyExist = await usermodel.findOne({ email });
-      if (isAlreadyExist) {
+      const existingUser = await usermodel.findOne({ email });
+      if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
       }
 
@@ -55,7 +52,6 @@ exports.userregister = [
         password: hashedPassword,
       });
 
-      // ✅ Send only safe fields (no password)
       const safeUser = {
         _id: user._id,
         firstname: user.firstname,
@@ -66,59 +62,50 @@ exports.userregister = [
       return res.status(201).json({ message: "User registered", user: safeUser });
     } catch (error) {
       console.error("Register error:", error);
-      res.status(500).json({ message: "Error while registering user" });
+      return res.status(500).json({ message: "Error while registering user" });
     }
   },
 ];
 
-// ========================== LOGIN ==========================
+// ================= LOGIN =================
 exports.postlogin = [
   body("email").isEmail().withMessage("Enter a valid email"),
-  body("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
-    .trim(),
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long").trim(),
 
   async (req, res) => {
     try {
       const { email, password } = req.body;
       const errors = validationResult(req);
-
       if (!errors.isEmpty()) {
         return res.status(400).json({
-          errors: errors.array().map((error) => error.msg),
-          oldinputs: { email, password },
+          errors: errors.array().map((err) => err.msg),
+          oldinputs: { email },
         });
       }
 
       const user = await usermodel.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: "Invalid email or password" });
-      }
+      if (!user) return res.status(400).json({ message: "Invalid email or password" });
 
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Invalid email or password" });
-      }
+      if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
-      // ✅ Generate JWT token
+      // Generate JWT
       const token = jwt.sign(
         { id: user._id, email: user.email },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
 
-      // ✅ Detect environment
       const isProduction = process.env.NODE_ENV === "production";
 
-      // ✅ Set cookie with environment-aware options
-     res.cookie("userToken", token, {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? "None" : "Lax",
-  path: "/",
-  maxAge: 24 * 60 * 60 * 1000,
-});
+      // Set cookie with proper options for Render
+      res.cookie("userToken", token, {
+        httpOnly: true,
+        secure: isProduction, // HTTPS in production
+        sameSite: isProduction ? "None" : "Lax",
+        path: "/",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
 
       const safeUser = {
         _id: user._id,
@@ -126,26 +113,22 @@ exports.postlogin = [
         email: user.email,
       };
 
-      return res
-        .status(200)
-        .json({ message: "Login successful", user: safeUser });
+      return res.status(200).json({ message: "Login successful", user: safeUser });
     } catch (error) {
       console.error("Login error:", error);
-      res.status(500).json({ message: "Error while logging in" });
+      return res.status(500).json({ message: "Error while logging in" });
     }
   },
 ];
-
-
-// ========================== LOGOUT ==========================
+// ================= LOGOUT =================
 exports.logout = (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
   res.clearCookie("userToken", {
     httpOnly: true,
-    secure: true,
-    sameSite: "None",
+    secure: isProduction,
+    sameSite: isProduction ? "None" : "Lax",
     path: "/",
   });
-
   return res.status(200).json({ message: "Logged out successfully" });
 };
 
