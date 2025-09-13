@@ -5,23 +5,22 @@ const Capitan = require("../models/capitan-model");
 // ====================== USER AUTH ======================
 exports.userauth = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    const token = req.cookies?.userToken;
     if (!token) {
       return res.status(401).json({ message: "Unauthorized: Please log in" });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Find user from DB
     const user = await User.findById(decoded.id);
     if (!user) {
       return res.status(401).json({ message: "Unauthorized: User not found" });
     }
-    console.log(user)
-    req.user = user; // ✅ attach full user doc
+
+    req.user = user;
     next();
   } catch (err) {
+    console.error("User auth error:", err.message);
     return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
   }
 };
@@ -29,25 +28,22 @@ exports.userauth = async (req, res, next) => {
 // ====================== CAPITAN AUTH ======================
 exports.capitanauth = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
-    console.log(req.cookies); // ✅ use req.cookies instead of res.cookies
+    const token = req.cookies?.capitanToken;
     if (!token) {
       return res.status(401).json({ message: "Unauthorized: Please log in" });
     }
-    // Verify token
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Find capitan from DB
     const capitan = await Capitan.findById(decoded.id);
     if (!capitan) {
       return res.status(401).json({ message: "Unauthorized: Capitan not found" });
     }
 
-    // ✅ Attach capitan to request
     req.capitan = capitan;
     next();
   } catch (err) {
+    console.error("Capitan auth error:", err.message);
     return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
   }
 };
-

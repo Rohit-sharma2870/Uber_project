@@ -108,11 +108,15 @@ exports.postlogin = [
         { expiresIn: "1d" }
       );
 
-      // ✅ Set cookie with token
-      res.cookie("token", token, {
+      // ✅ Detect environment
+      const isProduction = process.env.NODE_ENV === "production";
+
+      // ✅ Set cookie with environment-aware options
+      res.cookie("userToken", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: isProduction,                  
+        sameSite: isProduction ? "None" : "Lax", 
+        path: "/",
         maxAge: 24 * 60 * 60 * 1000,
       });
 
@@ -132,12 +136,14 @@ exports.postlogin = [
   },
 ];
 
+
 // ========================== LOGOUT ==========================
 exports.logout = (req, res) => {
-  res.clearCookie("token", {
+  res.clearCookie("userToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,
+    sameSite: "None",
+    path: "/",
   });
 
   return res.status(200).json({ message: "Logged out successfully" });
